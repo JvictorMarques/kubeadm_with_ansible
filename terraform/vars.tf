@@ -15,3 +15,21 @@ variable "workers_count" {
   description = "Number of worker nodes"
   default     = 2
 }
+
+variable "kubeadm_ansible_vpc_cidr" {
+  type        = string
+  description = "CIDR block for the VPC"
+  default     = "10.0.0.0/16"
+}
+
+variable "kubeadm_ansible_subnet" {
+  type = object({
+    cidr_block        = string
+    availability_zone = string
+  })
+  description = "Subnet configuration including CIDR block and availability zone"
+  default = {
+    cidr_block        = "10.0.1.0/24"
+    availability_zone = "us-east-1a"
+  }
+}
