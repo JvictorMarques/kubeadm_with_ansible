@@ -33,3 +33,13 @@ variable "kubeadm_ansible_subnet" {
     availability_zone = "us-east-1a"
   }
 }
+
+variable "ipv4_cidr" {
+  type        = string
+  description = "CIDR block for IPv4 access in security group rules"
+  default     = "10.0.0.0/24"
+  validation {
+    condition     = var.ipv4_cidr != "0.0.0.0/0"
+    error_message = "The ipv4_cidr must not be 0.0.0.0/0. Please provide a more restrictive CIDR block."
+  }
+}
