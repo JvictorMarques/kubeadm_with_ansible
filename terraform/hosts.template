@@ -1,0 +1,9 @@
+[master]
+%{ for host in master_nodes ~}
+${host}
+%{ endfor ~}
+
+[workers]
+%{ for host in worker_nodes ~}
+${host}
+%{ endfor ~}
