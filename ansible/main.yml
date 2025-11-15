@@ -1,0 +1,4 @@
+- name: Install Kubernetes packages and hold their versions
+  hosts: all
+  roles:
+    - setup
