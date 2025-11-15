@@ -1,4 +1,4 @@
-- name: Install Kubernetes packages and hold their versions
+- name: Setup dependencies for Kubernetes installation
   hosts: all
   roles:
     - setup
