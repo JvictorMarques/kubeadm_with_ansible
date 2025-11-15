@@ -1,0 +1,45 @@
+---
+tasks:
+  - name: Install dependencies
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop: "{{ kube_dependencies }}"
+
+  - name: Create apt keyring directory
+    ansible.builtin.file:
+      path: /etc/apt/keyrings
+      state: directory
+      mode: '0755'
+
+  - name: Download Kubernetes apt key
+    ansible.builtin.get_url:
+      url: https://pkgs.k8s.io/core:/stable:/v1.34/deb/Release.key
+      dest: /tmp/kubernetes-release.key
+      mode: '0644'
+
+  - name: Install keyring for Kubernetes apt repository
+    ansible.builtin.command:
+      cmd: >-
+        gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-release.key
+      creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+
+  - name: Add Kubernetes repository
+    ansible.builtin.apt_repository:
+      repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.34/deb/ /"
+      filename: "kubernetes"
+      state: present
+
+  - name: Install kubeadm, kubelet and kubectl
+    ansible.builtin.apt: 
+      name: "{{ item }}"
+      state: present
+      update_cache: yes
+    loop: "{{ kube_packages }}"
+
+  - name: Hold kubeadm, kubelet and kubectl at current version
+    ansible.builtin.apt:
+      name: "{{ item }}"
+      state: hold
+    loop: "{{ kube_packages }}"

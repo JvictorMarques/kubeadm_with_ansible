@@ -1,0 +1,11 @@
+---
+kube_dependencies:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gpg
+
+kube_packages:
+  - kubeadm
+  - kubelet
+  - kubectl

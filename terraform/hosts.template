@@ -7,3 +7,10 @@ ${host}
 %{ for host in worker_nodes ~}
 ${host}
 %{ endfor ~}
+
+[nodes:children]
+master
+workers
+
+[nodes:vars]
+ansible_user=ubuntu
