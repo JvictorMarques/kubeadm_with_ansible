@@ -53,7 +53,7 @@
   args:
     creates: /etc/apt/keyrings/docker.gpg
 
-- name: Adicionar repositório Docker
+- name: Add Docker repository
   ansible.builtin.apt_repository:
     repo: >-
       deb [arch={{ ansible_architecture }} signed-by=/etc/apt/keyrings/docker.gpg]
@@ -62,7 +62,7 @@
     filename: docker
     state: present
 
-- name: Atualizar cache do apt
+- name: Update apt cache
   become: true
   ansible.builtin.apt:
     update_cache: yes
@@ -74,36 +74,37 @@
     name: containerd
     state: present
 
-- name: Criar config padrão do containerd
+- name: Generate default containerd config
   ansible.builtin.command:
     cmd: containerd config default
   register: containerd_default_config
 
-- name: Criar diretório /etc/containerd
+- name: Create /etc/containerd directory
   ansible.builtin.file:
     path: /etc/containerd
     state: directory
     mode: '0755'
 
-- name: Gravar config em /etc/containerd/config.toml
+- name: Write config to /etc/containerd/config.toml
   ansible.builtin.copy:
     dest: /etc/containerd/config.toml
     content: "{{ containerd_default_config.stdout }}"
     mode: "0644"
 
-- name: Ativar SystemdCgroup no containerd
+- name: Enable SystemdCgroup in containerd
   ansible.builtin.replace:
     path: /etc/containerd/config.toml
     regexp: 'SystemdCgroup = false'
     replace: 'SystemdCgroup = true'
 
-- name: Atualizar sandbox_image para pause:3.10
+- name: Update sandbox_image to pause:3.10
   ansible.builtin.replace:
     path: /etc/containerd/config.toml
     regexp: 'sandbox_image = ".*"'
     replace: 'sandbox_image = "registry.k8s.io/pause:3.10"'
 
-- name: Reiniciar containerd
+- name: Restart containerd
+  become: true
   ansible.builtin.service:
     name: containerd
     state: restarted
