@@ -1,4 +1,6 @@
 - name: Setup dependencies for Kubernetes installation
   hosts: all
+  become: true
   roles:
+    - cri
     - setup

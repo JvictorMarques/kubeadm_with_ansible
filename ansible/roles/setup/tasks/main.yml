@@ -2,15 +2,14 @@
   become: true
   ansible.builtin.command:
     cmd: swapoff -a
-    warn: false
-  
+
 - name: Install dependencies
   become: true
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
     update_cache: yes
-  loop: "{{ kube_dependencies }}"
+  loop: "{{ dependencies }}"
 
 - name: Create apt keyring directory
   ansible.builtin.file:

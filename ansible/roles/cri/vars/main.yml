@@ -1,0 +1,8 @@
+modprobes: 
+  - overlay
+  - br_netfilter
+
+dependencies:
+  - ca-certificates
+  - curl
+  - gnupg

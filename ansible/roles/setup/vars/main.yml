@@ -1,4 +1,4 @@
-kube_dependencies:
+dependencies:
   - apt-transport-https
   - ca-certificates
   - curl
