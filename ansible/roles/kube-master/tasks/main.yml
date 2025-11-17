@@ -1,0 +1,45 @@
+- name: Check if kubeadm is initialized
+  stat:
+    path: /etc/kubernetes/admin.conf
+  register: kubeadm_initialized
+
+- name: Initialize Control Plane Node
+  ansible.builtin.command:
+    cmd: >-
+      kubeadm init --apiserver-advertise-address={{ ansible_default_ipv4.address }} 
+      --apiserver-cert-extra-sans={{ ansible_host }}
+      --pod-network-cidr={{ pod_network_cidr }}
+  when: not kubeadm_initialized.stat.exists
+
+- name: Create .kube directory
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/.kube
+    state: directory
+    mode: '0755'
+
+- name: Copy admin.conf to .kube/config
+  ansible.builtin.copy:
+    src: /etc/kubernetes/admin.conf
+    dest: /home/{{ ansible_user }}/.kube/config
+    remote_src: yes
+    mode: '0644'
+
+- name: Ensure .kube/config ownership
+  ansible.builtin.file:
+    path: /home/{{ ansible_user }}/.kube/config
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+
+- name: Install Calico Network Plugin
+  become: false
+  ansible.builtin.command:
+    cmd: kubectl apply -f {{ calico }}
+
+- name: Generate Join Command
+  ansible.builtin.command:
+    cmd: kubeadm token create --print-join-command
+  register: join_cmd
+
+- name: Share join command with workers
+  ansible.builtin.set_fact:
+    join_command: "{{ join_cmd.stdout }}"

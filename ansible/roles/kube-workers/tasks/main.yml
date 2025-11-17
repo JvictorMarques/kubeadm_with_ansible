@@ -1,0 +1,4 @@
+- name: Join worker nodes into cluster
+  shell: "{{ hostvars[groups['master'][0]]['join_command'] }}"
+  args:
+    creates: /etc/kubernetes/kubelet.conf

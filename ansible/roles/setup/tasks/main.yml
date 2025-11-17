@@ -1,10 +1,8 @@
 - name: Disable swap
-  become: true
   ansible.builtin.command:
     cmd: swapoff -a
 
 - name: Install dependencies
-  become: true
   ansible.builtin.apt:
     name: "{{ item }}"
     state: present
@@ -24,21 +22,18 @@
     mode: '0644'
 
 - name: Install keyring for Kubernetes apt repository
-  become: true
   ansible.builtin.command:
     cmd: >-
       gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg /tmp/kubernetes-release.key
     creates: /etc/apt/keyrings/kubernetes-apt-keyring.gpg
 
 - name: Add Kubernetes repository
-  become: true
   ansible.builtin.apt_repository:
     repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.34/deb/ /"
     filename: "kubernetes"
     state: present
 
 - name: Install kubeadm, kubelet and kubectl
-  become: true
   ansible.builtin.apt: 
     name: "{{ item }}"
     state: present
@@ -46,7 +41,6 @@
   loop: "{{ kube_packages }}"
 
 - name: Hold kubeadm, kubelet and kubectl at current version
-  become: true
   ansible.builtin.dpkg_selections:
     name: "{{ item }}"
     selection: hold

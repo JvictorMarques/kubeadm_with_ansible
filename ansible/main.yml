@@ -1,5 +1,24 @@
 - name: Setup dependencies for Kubernetes installation
   hosts: all
+  become: true
   roles:
     - cri
     - setup
+
+- name: Startup Kubernetes cluster
+  hosts: master
+  become: true
+  roles:
+    - kube-master
+
+- name: Join Worker Nodes to the Cluster
+  hosts: workers
+  become: true
+  roles:
+    - kube-workers
+
+- name: Copy kubeconfig to local machine
+  hosts: master
+  become: true
+  roles:
+    - copy-kubeconfig

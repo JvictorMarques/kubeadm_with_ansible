@@ -1,0 +1,21 @@
+- name: Duplicate kubeconfig file
+  ansible.builtin.copy:
+    src: /home/{{ ansible_user }}/.kube/config
+    dest: /home/{{ ansible_user }}/.kube/config-public
+    remote_src: yes
+    owner: "{{ ansible_user }}"
+    group: "{{ ansible_user }}"
+    mode: '0600'
+
+- name: Rewrite IP address in kubeconfig
+  ansible.builtin.replace:
+    path: /home/{{ ansible_user }}/.kube/config-public
+    regexp: "https://{{ ansible_default_ipv4.address }}:6443"
+    replace: "https://{{ ansible_host }}:6443"
+
+- name: Fetch kubeconfig to local machine
+  ansible.builtin.fetch:
+    src: /home/{{ ansible_user }}/.kube/config-public
+    dest: ../k8s/config
+    flat: yes
+    mode: '0600'

@@ -7,7 +7,6 @@
     mode: '0644'
 
 - name: Load modules
-  become: true
   ansible.builtin.modprobe:
     name: "{{ item }}"
   loop: "{{ modprobes }}"
@@ -22,11 +21,9 @@
     mode: '0644'
 
 - name: Apply sysctl
-  become: true
   ansible.builtin.command: sysctl --system
 
 - name: Install dependencies for containerd
-  become: true
   ansible.builtin.apt:
     update_cache: yes
     name: "{{ item }}"
@@ -47,7 +44,6 @@
 
 
 - name: Install Docker apt keyring
-  become: true
   ansible.builtin.command:
     cmd: gpg --dearmor -o /etc/apt/keyrings/docker.gpg /tmp/docker.gpg
   args:
@@ -63,12 +59,10 @@
     state: present
 
 - name: Update apt cache
-  become: true
   ansible.builtin.apt:
     update_cache: yes
 
 - name: Install containerd
-  become: true
   ansible.builtin.apt:
     update_cache: yes
     name: containerd
@@ -104,7 +98,6 @@
     replace: 'sandbox_image = "registry.k8s.io/pause:3.10"'
 
 - name: Restart containerd
-  become: true
   ansible.builtin.service:
     name: containerd
     state: restarted
